@@ -16,15 +16,16 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                 });
                 
                 var _arc = d3.svg.arc().startAngle(0 * (Math.PI / 180)).endAngle(360 * (Math.PI / 180));
+                var _handlerArc = d3.svg.arc().startAngle(0 * (Math.PI / 180)).endAngle(360 * (Math.PI / 180));
                 var _selectedArcs = [];
                 
                 var intervalPeriod = 5; //minutes
                 var _intervalAngles = 360 / ((24*60) / intervalPeriod);
 
-                var _w = 200;
+                var _w = 300;
                 var _h = _w;
                 var _diameter = _w;
-                var _margin = { top:0, right:0, bottom:0, left:0 }; //changing marging may upset angle calc
+                var _margin = { top:10, right:0, bottom:10, left:0 }; //changing marging may upset angle calc
                 var _fontSize = 10;
 
                 var _width;
@@ -229,9 +230,9 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             selArc.attr("d", _arc);
 
                             //setHandlePosition
-                            _arc.startAngle(((t.angles[1]-_intervalAngles) * Math.PI / 180));
-                            _arc.endAngle(((t.angles[1]+_intervalAngles) * Math.PI / 180));
-                            endHandle.attr("d", _arc);
+                            _handlerArc.startAngle(((t.angles[1]-_intervalAngles) * Math.PI / 180));
+                            _handlerArc.endAngle(((t.angles[1]+_intervalAngles) * Math.PI / 180));
+                            endHandle.attr("d", _handlerArc);
                         });
                         
                         dragHandleEnd.on("dragend", function(){ 
@@ -239,8 +240,8 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             scope.$apply();
                         });
 
-                        _arc.startAngle(((t.angles[1]-_intervalAngles) * Math.PI / 180));
-                        _arc.endAngle(((t.angles[1]+_intervalAngles) * Math.PI / 180));
+                        _handlerArc.startAngle(((t.angles[1]-_intervalAngles) * Math.PI / 180));
+                        _handlerArc.endAngle(((t.angles[1]+_intervalAngles) * Math.PI / 180));
 
                         var endHandle = enter.append("g").attr("class", "handle-container")
                             .append("path")
@@ -248,7 +249,7 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             .attr("cursor", "pointer")
                             .attr("fill", "#FFFFFF")
                             .attr("transform", "translate(" + _x0 + "," + _y0 + ")")
-                            .attr("d", _arc)
+                            .attr("d", _handlerArc)
                             .call(dragHandleEnd);
 
                         var dragHandleStart = d3.behavior.drag();
@@ -270,10 +271,15 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             _arc.endAngle((t.angles[1] * Math.PI / 180));
                             selArc.attr("d", _arc);
                             
-                            //setHandlePosition
-                            _arc.startAngle(((t.angles[0]-_intervalAngles) * Math.PI / 180));
-                            _arc.endAngle(((t.angles[0]+_intervalAngles) * Math.PI / 180));
-                            startHandle.attr("d", _arc);
+                            _handlerArc.startAngle(((t.angles[0]-_intervalAngles) * Math.PI / 180));
+                            _handlerArc.endAngle(((t.angles[0]+_intervalAngles) * Math.PI / 180));
+                            startHandle.attr("d", _handlerArc);
+
+                            var r = (_width / 2) + 9;
+                            var x = r * Math.cos((targetAngle - 90) * Math.PI / 180);
+                            var y = r * Math.sin((targetAngle - 90) * Math.PI / 180);
+                            
+                            d3.select(startHandle[0][0].nextSibling).attr('cx', x).attr('cy', y);
                         });
 
                         dragHandleStart.on("dragend", function(){ 
@@ -281,17 +287,26 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             scope.$apply();
                         });
 
-                        _arc.startAngle(((t.angles[0]-_intervalAngles) * Math.PI / 180));
-                        _arc.endAngle(((t.angles[0]+_intervalAngles) * Math.PI / 180));
+                        _handlerArc.startAngle(((t.angles[0]-_intervalAngles) * Math.PI / 180));
+                        _handlerArc.endAngle(((t.angles[0]+_intervalAngles) * Math.PI / 180));
                         
-                        var startHandle = enter.append("g").attr("class", "handle-container")
-                            .append("path").attr("class", "x1-timepicker-handler start-handle")
+                        var sg = enter.append("g").attr("class", "handle-container");
+                        var startHandle = sg.append("path")
+                            .attr("class", "x1-timepicker-handler start-handle")
                             .attr("cursor", "pointer")
                             .attr("transform", "translate(" + _x0 + "," + _y0 + ")")
                             .attr("fill", "#FFFFFF")
-                            .attr("d", _arc)
-                            .call(dragHandleStart);
+                            .attr("d", _handlerArc);
                         
+                        sg.append("circle")
+                            .attr("cursor", "pointer")
+                            .attr("transform", "translate(" + (_x0) + "," + (_y0) + ")")
+                            .attr("cx", 0)
+                            .attr("cy", 0)
+                            .attr("fill", "#FFFFFF")
+                            .attr("r", 10);
+
+                        sg.call(dragHandleStart);                        
                     });
                 });
 
@@ -301,14 +316,8 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                     _fontSize = _width * .2;
                     _arc.outerRadius(_width / 2);
                     _arc.innerRadius(_width / 2 * .85);
-                }
-
-                function setHandlePosition(handle, angle){
-                    var r = _width / 2 - 5;
-                    var x = r * Math.cos((angle - 90) * Math.PI / 180);
-                    var y = r * Math.sin((angle - 90) * Math.PI / 180);
-                    handle.attr('cx', x).attr('cy', y);
-                    handle.attr('x', x).attr('y', y);
+                    _handlerArc.outerRadius((_width/2));
+                    _handlerArc.innerRadius(_width / 2 * .85);
                 }
             }
         };
