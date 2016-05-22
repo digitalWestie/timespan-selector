@@ -28,10 +28,10 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                 var intervalPeriod = 5; //minutes
                 var _intervalAngles = 360 / ((24*60) / intervalPeriod);
 
-                var _w = 300;
+                var _w = 320;
                 var _h = _w;
                 var _diameter = _w;
-                var _margin = { top:10, right:0, bottom:10, left:0 }; //changing marging may upset angle calc
+                var _margin = { top:10, right:10, bottom:10, left:10 }; //changing marging may upset angle calc
                 var _fontSize = 10;
 
                 var _width;
@@ -43,9 +43,11 @@ angular.module("ui.timespan-selector", ["angularMoment"])
 
                 var svg = d3.select(element[0]).selectAll("svg").data([undefined]);
 
+
+
                 var enter = svg.enter().append("svg")
                     .attr("class", "x1-timepicker-svg").append("g")
-                    .attr("transform", "translate(" + _margin.left + "," + _margin.top + ")");
+                    .attr("transform", "translate(" + (_margin.left*2) + "," + (_margin.top*2) + ")");
 
                 svg.attr("width", _w).attr("height", _h);
 
