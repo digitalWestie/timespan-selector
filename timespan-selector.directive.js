@@ -198,6 +198,13 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                     }
                 }
 
+                function getCircleCoords(targetAngle){
+                    var r = (_width / 2) + 9;
+                    var x = r * Math.cos((targetAngle - 90) * Math.PI / 180);
+                    var y = r * Math.sin((targetAngle - 90) * Math.PI / 180);
+                    return [x,y];
+                }
+
                 scope.$watch('selections', function (newVal, oldVal) {
                     if ((!newVal || newVal.length===0)) { return; }
                     enter.selectAll('.arc, .handle-container').remove();
@@ -232,7 +239,10 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             //setHandlePosition
                             _handlerArc.startAngle(((t.angles[1]-_intervalAngles) * Math.PI / 180));
                             _handlerArc.endAngle(((t.angles[1]+_intervalAngles) * Math.PI / 180));
-                            endHandle.attr("d", _handlerArc);
+                            endBuffer.attr("d", _handlerArc);
+
+                            var xy = getCircleCoords(t.angles[1]);
+                            d3.select(endBuffer[0][0].nextSibling).attr('cx', xy[0]).attr('cy', xy[1]);
                         });
                         
                         dragHandleEnd.on("dragend", function(){ 
@@ -240,17 +250,27 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             scope.$apply();
                         });
 
+                        
+                        var endG = enter.append("g").attr("class", "handle-container").call(dragHandleEnd);
+                        
                         _handlerArc.startAngle(((t.angles[1]-_intervalAngles) * Math.PI / 180));
                         _handlerArc.endAngle(((t.angles[1]+_intervalAngles) * Math.PI / 180));
-
-                        var endHandle = enter.append("g").attr("class", "handle-container")
-                            .append("path")
+                        var endBuffer = endG.append("path")
                             .attr("class", "x1-timepicker-handler end-handle")
                             .attr("cursor", "pointer")
                             .attr("fill", "#FFFFFF")
                             .attr("transform", "translate(" + _x0 + "," + _y0 + ")")
-                            .attr("d", _handlerArc)
-                            .call(dragHandleEnd);
+                            .attr("d", _handlerArc);
+
+                        var xy = getCircleCoords(t.angles[1]);
+                        var endC = endG.append("circle")
+                            .attr("cursor", "pointer")
+                            .attr("transform", "translate(" + (_x0) + "," + (_y0) + ")")
+                            .attr("cx", xy[0])
+                            .attr("cy", xy[1])
+                            .attr("fill", "#FFFFFF")
+                            .attr("r", 10);
+
 
                         var dragHandleStart = d3.behavior.drag();
                         dragHandleStart.on("drag", function() {
@@ -273,40 +293,37 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             
                             _handlerArc.startAngle(((t.angles[0]-_intervalAngles) * Math.PI / 180));
                             _handlerArc.endAngle(((t.angles[0]+_intervalAngles) * Math.PI / 180));
-                            startHandle.attr("d", _handlerArc);
+                            startBuffer.attr("d", _handlerArc);
 
-                            var r = (_width / 2) + 9;
-                            var x = r * Math.cos((targetAngle - 90) * Math.PI / 180);
-                            var y = r * Math.sin((targetAngle - 90) * Math.PI / 180);
-                            
-                            d3.select(startHandle[0][0].nextSibling).attr('cx', x).attr('cy', y);
+                            var xy = getCircleCoords(t.angles[0]);
+                            d3.select(startBuffer[0][0].nextSibling).attr('cx', xy[0]).attr('cy', xy[1]);
                         });
 
                         dragHandleStart.on("dragend", function(){ 
                             t.start = getAngleTime(t.angles[0]);
                             scope.$apply();
                         });
+                        
+                        var startG = enter.append("g").attr("class", "handle-container").call(dragHandleStart);
 
                         _handlerArc.startAngle(((t.angles[0]-_intervalAngles) * Math.PI / 180));
                         _handlerArc.endAngle(((t.angles[0]+_intervalAngles) * Math.PI / 180));
-                        
-                        var sg = enter.append("g").attr("class", "handle-container");
-                        var startHandle = sg.append("path")
+
+                        var startBuffer = startG.append("path")
                             .attr("class", "x1-timepicker-handler start-handle")
                             .attr("cursor", "pointer")
                             .attr("transform", "translate(" + _x0 + "," + _y0 + ")")
                             .attr("fill", "#FFFFFF")
                             .attr("d", _handlerArc);
-                        
-                        sg.append("circle")
+
+                        var xy = getCircleCoords(t.angles[0]);
+                        var startC = startG.append("circle")
                             .attr("cursor", "pointer")
                             .attr("transform", "translate(" + (_x0) + "," + (_y0) + ")")
-                            .attr("cx", 0)
-                            .attr("cy", 0)
+                            .attr("cx", xy[0])
+                            .attr("cy", xy[1])
                             .attr("fill", "#FFFFFF")
                             .attr("r", 10);
-
-                        sg.call(dragHandleStart);                        
                     });
                 });
 
