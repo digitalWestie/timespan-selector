@@ -65,6 +65,7 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                     .on("click", function(){
                         var ev = d3.mouse(d3.select('svg').node());
                         var targetAngle = getTargetAngle(ev[0], ev[1]);
+                        targetAngle = roundToInterval(targetAngle);
                         var startTime = getAngleTime(targetAngle);
                         addSelection(startTime);
                     });
@@ -199,7 +200,7 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                 scope.$watch('selections', function (newVal, oldVal) {
                     if ((!newVal || newVal.length===0)) { return; }
                     enter.selectAll('.arc, .handle-container').remove();
-
+                    
                     scope.selections.forEach(function(t,i){
                         _arc.startAngle((t.angles[0] * Math.PI / 180));
                         _arc.endAngle((t.angles[1] * Math.PI / 180));
@@ -216,6 +217,7 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             var eventX = d3.event.x;
                             var eventY = d3.event.y;
                             var targetAngle = getTargetAngle(eventX, eventY);
+                            targetAngle = roundToInterval(targetAngle);
                             
                             if (Math.abs(targetAngle - t.angles[0]) <= _intervalAngles){ return; } //selection too short
                             if (targetAngle < t.angles[0]){ targetAngle+=360; }
@@ -254,6 +256,7 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                             var eventX = d3.event.x;
                             var eventY = d3.event.y;
                             var targetAngle = getTargetAngle(eventX, eventY);
+                            targetAngle = roundToInterval(targetAngle);
                             var endAngle = t.angles[1];
                             
                             if (Math.abs(t.angles[1] - targetAngle) <= _intervalAngles){ return; }
