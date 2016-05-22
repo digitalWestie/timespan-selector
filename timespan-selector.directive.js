@@ -11,8 +11,14 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                 //0 - 6.283185307179586 represent 0 to 360 degrees
 
                 var div = angular.element(element[0]).append('<button class="addSelection">Add selection</button>');
+                var div = angular.element(element[0]).append('<button class="removeSelection">Remove selection</button>');
                 angular.element(div.children()[0]).on("click", function(){
                     addSelection();
+                });
+                angular.element(div.children()[1]).on("click", function(){
+                    scope.selections.pop();
+                    scope.selections = angular.copy(scope.selections);
+                    scope.$apply();
                 });
                 
                 var _arc = d3.svg.arc().startAngle(0 * (Math.PI / 180)).endAngle(360 * (Math.PI / 180));
@@ -206,8 +212,9 @@ angular.module("ui.timespan-selector", ["angularMoment"])
                 }
 
                 scope.$watch('selections', function (newVal, oldVal) {
-                    if ((!newVal || newVal.length===0)) { return; }
+                    console.log(newVal);
                     enter.selectAll('.arc, .handle-container').remove();
+                    if ((!newVal || newVal.length===0)) { return; }
                     
                     scope.selections.forEach(function(t,i){
                         _arc.startAngle((t.angles[0] * Math.PI / 180));
