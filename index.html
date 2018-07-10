@@ -13,13 +13,19 @@
 
     <style>
         body {
-            background: #e7e7e7;
+             background: #dbdbdb;
+        }
+        ul {
+            font-family: sans-serif;
+            font-size: 1.5em;
         }
     </style>
 </head>
 <body ng-controller="TimespanSelectorDemoCtrl">
 
     <ui-timespans ng-model="selections" max-selections="maxSelections" ></ui-timespans>
+    
+    <h3>Selected timespans</h3>
     <ul>
         <li ng-repeat="selection in selections">
 
